@@ -22,6 +22,7 @@ TrueBid implements a dynamic RFQ-based auction system where suppliers compete by
 
 ## Workflow
 ![System Diagram](./docs/Workflow_diagram.png)
+ - Tool used for flow diagram - draw.io
 
 ## High Level Design
 The system follows a modular monolithic architecture where the frontend communicates with backend APIs. The backend is logically divided into services to handle different responsibilities.
@@ -37,6 +38,7 @@ The system follows a modular monolithic architecture where the frontend communic
 When a bid is placed, it is validated and stored, rankings are updated, and the auction engine checks whether the auction should be extended based on defined conditions.
 
 ![System Diagram](./docs/High_Level_Design.png)
+ - Tool use for making HLD diagram - draw.io
 
 # 🗄️ Database Schema – TrueBid RFQ Auction System
 
@@ -48,6 +50,7 @@ This system models a **British Auction-based RFQ (Request for Quotation)** proce
 ## 🗂️ ER Diagram
 
 ![ER Diagram](./docs/schema_design.png)
+ - Tool used for making Schema Diagram - mermaid live editor
 
 ---
 
