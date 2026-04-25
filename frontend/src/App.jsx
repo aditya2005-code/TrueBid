@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import RFQList from './pages/RFQList';
+import RFQDetail from './pages/RFQDetail';
 import AuctionDetails from './pages/AuctionDetails';
 import CreateRFQModal from './components/CreateRFQModal';
 
@@ -31,7 +32,7 @@ function App() {
               path="/"
               element={<RFQList key={refreshKey} onNewAuction={() => setShowCreateModal(true)} />}
             />
-            <Route path="/rfq/:id" element={<AuctionDetails />} />
+            <Route path="/rfq/:id" element={<RFQDetail />} />
           </Routes>
         </main>
 
