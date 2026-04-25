@@ -17,12 +17,11 @@ export const createRFQ = async (req, res) => {
             status
         } = req.body;
 
-        // Validation Rule: Forced Bid Close Time must always be greater than Bid Close Time
+        // Validation Rule
         if (new Date(forced_close_time) <= new Date(bid_close_time)) {
             return res.status(400).json({ error: "forced_close_time must be greater than bid_close_time" });
         }
 
-        // Default constraints for trigger and extension if not provided (e.g. 10 mins window, 5 mins extension)
         const finalTriggerWindow = trigger_window_minutes || 10;
         const finalExtensionDuration = extension_duration_minutes || 5;
 
