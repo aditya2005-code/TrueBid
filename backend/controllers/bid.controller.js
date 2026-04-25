@@ -1,4 +1,5 @@
-import { placeBidService, getBidsForRFQService } from "../services/bid.service.js";
+import { placeBidService } from "../services/bid.service.js";
+import { getLeaderboard } from "../services/leaderboard.service.js";
 
 export const placeBid = async (req, res) => {
     try {
@@ -14,7 +15,7 @@ export const placeBid = async (req, res) => {
 export const getBidsForRFQ = async (req, res) => {
     try {
         const { rfqId } = req.params;
-        const bids = await getBidsForRFQService(rfqId);
+        const bids = await getLeaderboard(rfqId);
         return res.status(200).json({ data: bids });
     } catch (error) {
         console.error("Error fetching bids:", error);
