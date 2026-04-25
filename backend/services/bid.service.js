@@ -15,7 +15,8 @@ export const placeBidService = async (data) => {
     if (rfq.length === 0) throw new Error("RFQ not active or does not exist");
 
     const r = rfq[0];
-    const now = new Date();
+    const timeResult = await sql`SELECT NOW() as now`;
+    const now = new Date(timeResult[0].now);
     const bidCloseTime = new Date(r.bid_close_time);
     const forcedCloseTime = new Date(r.forced_close_time);
 
@@ -25,6 +26,12 @@ export const placeBidService = async (data) => {
 
     if (now > bidCloseTime) {
         throw new Error("Auction is already closed");
+    }
+
+    const bidStartTime = new Date(r.bid_start_time);
+
+    if (now < bidStartTime) {
+        throw new Error("Auction has not started yet");
     }
 
     // 2. Get previous ranking
@@ -57,7 +64,9 @@ export const placeBidService = async (data) => {
     const newL1 = newOrder[0] || null;
 
     const l1Changed = previousL1 !== newL1;
-    const rankChanged = JSON.stringify(previousOrder) !== JSON.stringify(newOrder);
+    const rankChanged =
+        previousOrder.length !== newOrder.length ||
+        previousOrder.some((id, i) => id !== newOrder[i]);
 
     // 5. Trigger window logic
     const diffMs = bidCloseTime.getTime() - now.getTime();
@@ -73,7 +82,6 @@ export const placeBidService = async (data) => {
             bidCloseTime.getTime() + r.extension_duration_minutes * 60000
         );
 
-        // Clamp to forced close
         if (newCloseTime > forcedCloseTime) {
             newCloseTime = forcedCloseTime;
         }
@@ -82,7 +90,6 @@ export const placeBidService = async (data) => {
         if (newCloseTime.getTime() > bidCloseTime.getTime()) {
             extended = true;
 
-            // ✅ FIX 3: Proper reason priority
             if (l1Changed) {
                 extensionReason = "L1_CHANGE";
             } else if (rankChanged) {
