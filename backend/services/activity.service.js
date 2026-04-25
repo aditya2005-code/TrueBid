@@ -13,7 +13,7 @@ export const logBidPlaced = async (rfq_id, supplier_id, amount) => {
 
 export const logExtension = async (rfq_id, reason, previousTime, newTime, supplier_id = null, extension_minutes = null) => {
     let message = `Auction extended due to ${reason}`;
-
+    
     if (reason === "L1_CHANGE" && supplier_id && extension_minutes) {
         message = `Supplier ${supplier_id} became lowest bidder. Auction extended by ${extension_minutes} minutes`;
     }

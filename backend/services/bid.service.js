@@ -1,4 +1,7 @@
 import sql from "../configs/db.js";
+import { validateAuctionTime, detectRankingChange, shouldExtendAuction, calculateNewCloseTime } from "./auction.service.js";
+import { logBidPlaced, logExtension } from "./activity.service.js";
+import { getLeaderboard } from "./leaderboard.service.js";
 
 // Place a bid and apply extension logic
 export const placeBidService = async (data) => {
@@ -17,33 +20,22 @@ export const placeBidService = async (data) => {
     const r = rfq[0];
     const timeResult = await sql`SELECT NOW() as now`;
     const now = new Date(timeResult[0].now);
+
+    // 2. Validate Time (Throws error if invalid)
+    validateAuctionTime(r, now);
+
     const bidCloseTime = new Date(r.bid_close_time);
-    const forcedCloseTime = new Date(r.forced_close_time);
 
-    if (now >= forcedCloseTime) {
-        throw new Error("Auction has reached forced close time and is strictly closed");
+    // 3. Get previous ranking
+    const previousBids = await getLeaderboard(rfq_id);
+
+    // 3b. Better Bid Only Check
+    const currentLowest = previousBids.length > 0 ? previousBids[0].total_amount : null;
+    if (currentLowest !== null && parseFloat(total_amount) >= parseFloat(currentLowest)) {
+        throw new Error("Bid must be lower than current lowest bid");
     }
 
-    if (now > bidCloseTime) {
-        throw new Error("Auction is already closed");
-    }
-
-    const bidStartTime = new Date(r.bid_start_time);
-
-    if (now < bidStartTime) {
-        throw new Error("Auction has not started yet");
-    }
-
-    // 2. Get previous ranking
-    const previousBids = await sql`
-        SELECT supplier_id FROM bid 
-        WHERE rfq_id = ${rfq_id} 
-        ORDER BY total_amount ASC
-    `;
-    const previousOrder = previousBids.map(b => b.supplier_id);
-    const previousL1 = previousOrder[0] || null;
-
-    // 3. Insert Bid
+    // 4. Insert Bid
     const newBid = await sql`
         INSERT INTO bid (
             rfq_id, supplier_id, freight_charges, origin_charges, destination_charges,
@@ -54,98 +46,58 @@ export const placeBidService = async (data) => {
         ) RETURNING *;
     `;
 
-    // 4. Get updated ranking
-    const updatedBids = await sql`
-        SELECT supplier_id FROM bid 
-        WHERE rfq_id = ${rfq_id} 
-        ORDER BY total_amount ASC
-    `;
-    const newOrder = updatedBids.map(b => b.supplier_id);
-    const newL1 = newOrder[0] || null;
+    // 5. Get updated ranking
+    const updatedBids = await getLeaderboard(rfq_id);
+    const { l1Changed, rankChanged } = detectRankingChange(previousBids, updatedBids);
 
-    const l1Changed = previousL1 !== newL1;
-    const rankChanged =
-        previousOrder.length !== newOrder.length ||
-        previousOrder.some((id, i) => id !== newOrder[i]);
-
-    // 5. Trigger window logic
+    // 6. Trigger window logic & extensions
     const diffMs = bidCloseTime.getTime() - now.getTime();
     const diffMins = diffMs / (1000 * 60);
     const inTriggerWindow = diffMins <= r.trigger_window_minutes;
 
+    const { shouldExtend, extensionReason } = shouldExtendAuction({ inTriggerWindow, l1Changed, rankChanged });
+
     let extended = false;
-    let extensionReason = null;
     let newCloseTime = bidCloseTime;
 
-    if (inTriggerWindow || l1Changed || rankChanged) {
-        newCloseTime = new Date(
-            bidCloseTime.getTime() + r.extension_duration_minutes * 60000
-        );
-
-        if (newCloseTime > forcedCloseTime) {
-            newCloseTime = forcedCloseTime;
-        }
+    if (shouldExtend) {
+        newCloseTime = calculateNewCloseTime(r, bidCloseTime);
 
         // Only extend if time actually increases
         if (newCloseTime.getTime() > bidCloseTime.getTime()) {
             extended = true;
 
-            if (l1Changed) {
-                extensionReason = "L1_CHANGE";
-            } else if (rankChanged) {
-                extensionReason = "RANK_CHANGE";
-            } else {
-                extensionReason = "TRIGGER_WINDOW";
-            }
+            // Update RFQ if extended
+            await sql`
+                UPDATE rfq 
+                SET bid_close_time = ${newCloseTime}, updated_at = CURRENT_TIMESTAMP
+                WHERE id = ${rfq_id}
+            `;
+
+            // Log extension
+            await logExtension(
+                rfq_id, 
+                extensionReason, 
+                bidCloseTime, 
+                newCloseTime, 
+                supplier_id, 
+                r.extension_duration_minutes
+            );
         }
     }
 
-    // 6. Log bid placement
-    await sql`
-        INSERT INTO activity_log (rfq_id, event_type, message)
-        VALUES (
-            ${rfq_id},
-            'BID_PLACED',
-            ${`Supplier ${supplier_id} placed bid: ${total_amount}`}
-        )
-    `;
-
-    // 7. Update RFQ if extended
-    if (extended) {
-        await sql`
-            UPDATE rfq 
-            SET bid_close_time = ${newCloseTime}, updated_at = CURRENT_TIMESTAMP
-            WHERE id = ${rfq_id}
-        `;
-
-        await sql`
-            INSERT INTO activity_log (
-                rfq_id, event_type, message, previous_end_time, new_end_time
-            )
-            VALUES (
-                ${rfq_id},
-                'EXTENSION',
-                ${`Auction extended due to ${extensionReason}`},
-                ${bidCloseTime},
-                ${newCloseTime}
-            )
-        `;
-    }
+    // 7. Log bid placement
+    await logBidPlaced(rfq_id, supplier_id, total_amount);
 
     return {
         bid: newBid[0],
         extended,
-        extensionReason,
+        extensionReason: extended ? extensionReason : null,
         previousCloseTime: bidCloseTime,
         newCloseTime
     };
 };
 
 export const getBidsForRFQService = async (rfqId) => {
-    const bids = await sql`
-        SELECT * FROM bid 
-        WHERE rfq_id = ${rfqId} 
-        ORDER BY total_amount ASC
-    `;
-    return bids;
+    return await getLeaderboard(rfqId);
 };

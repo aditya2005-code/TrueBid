@@ -17,9 +17,21 @@ export const createRFQ = async (req, res) => {
             status
         } = req.body;
 
-        // Validation Rule
-        if (new Date(forced_close_time) <= new Date(bid_close_time)) {
-            return res.status(400).json({ error: "forced_close_time must be greater than bid_close_time" });
+        // Required Field Validation
+        if (!client_id || !rfq_name || !pickup_date) {
+            return res.status(400).json({ error: "client_id, rfq_name, and pickup_date are required" });
+        }
+
+        // Time Validation Rule
+        const start = new Date(bid_start_time);
+        const close = new Date(bid_close_time);
+        const forced = new Date(forced_close_time);
+
+        if (start >= close) {
+            return res.status(400).json({ error: "bid_start_time must be less than bid_close_time" });
+        }
+        if (close >= forced) {
+            return res.status(400).json({ error: "bid_close_time must be less than forced_close_time" });
         }
 
         const finalTriggerWindow = trigger_window_minutes || 10;
