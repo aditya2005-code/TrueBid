@@ -74,7 +74,7 @@ export const getRFQById = async (req, res) => {
     }
 };
 
-// Get activity logs for an RFQ
+// Get activity logs for an RFQ (Request for Quotation)
 export const getActivityLogs = async (req, res) => {
     try {
         const { id } = req.params;

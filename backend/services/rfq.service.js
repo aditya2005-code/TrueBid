@@ -14,7 +14,9 @@ export const createRFQService = async (data) => {
             trigger_window_minutes, extension_duration_minutes, status
         ) VALUES (
             ${client_id}, ${rfq_name}, ${reference_id}, ${description}, ${pickup_date}, 
-            ${bid_start_time}, ${bid_close_time}, ${forced_close_time},
+            ${new Date(bid_start_time)}, 
+            ${new Date(bid_close_time)}, 
+            ${new Date(forced_close_time)},
             ${trigger_window_minutes}, ${extension_duration_minutes}, ${status || 'ACTIVE'}
         ) RETURNING *;
     `;
