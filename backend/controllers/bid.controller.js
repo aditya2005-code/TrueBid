@@ -10,3 +10,16 @@ export const placeBid = async (req, res) => {
     }
 };
 
+
+export const getBidsForRFQ = async (req, res) => {
+    try {
+        const { rfqId } = req.params;
+        const bids = await getBidsForRFQService(rfqId);
+        return res.status(200).json({ data: bids });
+    } catch (error) {
+        console.error("Error fetching bids:", error);
+        return res.status(500).json({ error: "Internal Server Error" });
+    }
+};
+
+
