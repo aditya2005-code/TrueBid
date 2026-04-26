@@ -70,7 +70,7 @@ const CreateRFQ = () => {
     <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* Header */}
       <div className="flex flex-col gap-4">
-        <Link to="/" className="inline-flex items-center gap-2 text-slate-500 hover:text-blue-600 transition-colors text-sm font-bold w-fit">
+        <Link to="/auctions" className="inline-flex items-center gap-2 text-slate-500 hover:text-blue-600 transition-colors text-sm font-bold w-fit">
           <ArrowLeft size={16} /> Back to Auctions
         </Link>
         <div className="flex items-center justify-between">

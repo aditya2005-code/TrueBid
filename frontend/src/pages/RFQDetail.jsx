@@ -125,7 +125,7 @@ const RFQDetail = () => {
   return (
     <div className="space-y-6">
       {/* Back Nav */}
-      <Link to="/" className="inline-flex items-center gap-2 text-slate-500 hover:text-blue-600 transition-colors text-sm font-semibold">
+      <Link to="/auctions" className="inline-flex items-center gap-2 text-slate-500 hover:text-blue-600 transition-colors text-sm font-semibold">
         <ArrowLeft size={16} /> Back to Auctions
       </Link>
 
