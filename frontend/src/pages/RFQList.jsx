@@ -31,7 +31,7 @@ const StatusBadge = ({ status }) => {
   );
 };
 
-const RFQList = ({ onNewAuction }) => {
+const RFQList = () => {
   const [rfqs, setRfqs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -83,7 +83,7 @@ const RFQList = ({ onNewAuction }) => {
         </div>
         <button
           id="new-auction-btn"
-          onClick={onNewAuction}
+          onClick={() => navigate('/create')}
           className="flex items-center gap-2 bg-gradient-to-tr from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white px-5 py-2.5 rounded-xl font-bold transition-all shadow-lg hover:shadow-blue-500/30 hover:-translate-y-0.5 active:translate-y-0"
         >
           <PlusCircle size={18} />
@@ -99,7 +99,7 @@ const RFQList = ({ onNewAuction }) => {
           </div>
           <h3 className="text-lg font-bold text-slate-900 mb-1">No auctions yet</h3>
           <p className="text-slate-500 mb-6">Create your first RFQ to start receiving bids.</p>
-          <button onClick={onNewAuction} className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-bold transition-all">
+          <button onClick={() => navigate('/create')} className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-bold transition-all">
             <PlusCircle size={18} /> Create RFQ
           </button>
         </div>
