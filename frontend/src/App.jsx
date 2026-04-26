@@ -1,19 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import RFQList from './pages/RFQList';
 import RFQDetail from './pages/RFQDetail';
-import AuctionDetails from './pages/AuctionDetails';
-import CreateRFQModal from './components/CreateRFQModal';
+import CreateRFQ from './pages/CreateRFQ';
 
 function App() {
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [refreshKey, setRefreshKey] = useState(0);
-
-  const handleCreated = () => {
-    setShowCreateModal(false);
-    setRefreshKey(k => k + 1);
-  };
-
   return (
     <BrowserRouter>
       <div className="min-h-screen bg-slate-50 font-sans text-slate-800">
@@ -28,20 +19,11 @@ function App() {
 
         <main className="max-w-7xl mx-auto p-8">
           <Routes>
-            <Route
-              path="/"
-              element={<RFQList key={refreshKey} onNewAuction={() => setShowCreateModal(true)} />}
-            />
+            <Route path="/" element={<RFQList />} />
+            <Route path="/create" element={<CreateRFQ />} />
             <Route path="/rfq/:id" element={<RFQDetail />} />
           </Routes>
         </main>
-
-        {showCreateModal && (
-          <CreateRFQModal
-            onClose={() => setShowCreateModal(false)}
-            onCreated={handleCreated}
-          />
-        )}
       </div>
     </BrowserRouter>
   );
