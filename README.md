@@ -46,7 +46,7 @@ This system models a **British Auction-based RFQ (Request for Quotation)** proce
 
 ---
 
-## ER Diagram
+## Schema Diagram
 
 ![ER Diagram](./docs/schema_design.png)
  - Tool used for making Schema Diagram - mermaid live editor
