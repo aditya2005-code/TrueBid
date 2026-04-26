@@ -21,7 +21,7 @@ TrueBid implements a dynamic RFQ-based auction system where suppliers compete by
 - Reliability
 
 ## Workflow
-![System Diagram](./docs/Workflow_diagram.png)
+![System Diagram](./docs/workflow_diagram.png)
  - Tool used for flow diagram - draw.io
 
 ## High Level Design
@@ -160,7 +160,7 @@ Stores all auction-related events for transparency and auditability.
 
 ---
 
-## ⚙️ Auction Logic (Core Feature)
+## Auction Logic (Core Feature)
 
 The system implements a **British Auction with dynamic time extensions**.
 
@@ -189,7 +189,7 @@ The system implements a **British Auction with dynamic time extensions**.
 - Extension Duration: 5 minutes  
 
 If a bid is placed at 5:55 PM →  
-👉 Auction extends to 6:05 PM  
+Auction extends to 6:05 PM  
 
 ---
 
