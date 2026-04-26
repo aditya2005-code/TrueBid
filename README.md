@@ -192,7 +192,7 @@ Auction extends to 6:05 PM
 
 ---
 
-## 🔌 API Endpoints
+## API Endpoints
 
 ### RFQ APIs
 - `POST /api/rfqs` → Create RFQ  
@@ -206,7 +206,7 @@ Auction extends to 6:05 PM
 
 ---
 
-## 🖥️ Frontend Features
+## Frontend Features
 
 - Landing page with system overview  
 - RFQ listing with live auction status  
@@ -219,7 +219,7 @@ Auction extends to 6:05 PM
 
 ---
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
 ### Frontend
 - React (Vite)
