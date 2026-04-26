@@ -1,8 +1,6 @@
 import dotenv from "dotenv";
 dotenv.config({ path: "./.env" });
 import express from "express";
-import pg from "pg";
-import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 
