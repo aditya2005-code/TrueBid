@@ -157,3 +157,94 @@ Stores all auction-related events for transparency and auditability.
 - One **RFQ** can have multiple **Activity Logs**
 
 ---
+
+---
+
+## ⚙️ Auction Logic (Core Feature)
+
+The system implements a **British Auction with dynamic time extensions**.
+
+### Key Rules:
+
+1. **Trigger Window (X minutes)**  
+   - If a bid is placed within the last X minutes before closing, extension may occur.
+
+2. **Extension Duration (Y minutes)**  
+   - Auction extends by Y minutes when triggered.
+
+3. **Extension Triggers**
+   - Bid placed in trigger window  
+   - Any supplier rank change  
+   - Lowest bidder (L1) change  
+
+4. **Forced Close Rule**
+   - Auction will never extend beyond `forced_close_time`
+
+---
+
+### Example
+
+- Close Time: 6:00 PM  
+- Trigger Window: 10 minutes  
+- Extension Duration: 5 minutes  
+
+If a bid is placed at 5:55 PM →  
+👉 Auction extends to 6:05 PM  
+
+---
+
+## 🔌 API Endpoints
+
+### RFQ APIs
+- `POST /api/rfqs` → Create RFQ  
+- `GET /api/rfqs` → Get all RFQs  
+- `GET /api/rfqs/:id` → Get RFQ details  
+- `GET /api/rfqs/:id/logs` → Get activity logs  
+
+### Bid APIs
+- `POST /api/bids` → Place bid  
+- `GET /api/bids/rfq/:rfqId` → Get leaderboard  
+
+---
+
+## 🖥️ Frontend Features
+
+- Landing page with system overview  
+- RFQ listing with live auction status  
+- RFQ detail page:
+  - Leaderboard (L1, L2, L3 ranking)  
+  - Bid submission form  
+  - Activity logs (bid + extension history)  
+  - Auto-refresh every 5 seconds  
+  - Live indicator and last updated timestamp  
+
+---
+
+## 🛠️ Tech Stack
+
+### Frontend
+- React (Vite)
+- Tailwind CSS  
+
+### Backend
+- Node.js
+- Express.js  
+
+### Database
+- PostgreSQL (Neon)
+
+---
+
+## ⚙️ Setup Instructions
+
+### Backend
+```bash
+cd backend
+npm install
+npm start
+
+### Frontend
+```bash
+cd frontend
+npm install
+npm run dev
