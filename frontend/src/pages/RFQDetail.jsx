@@ -82,6 +82,7 @@ const RFQDetail = () => {
   const [bids, setBids] = useState([]);
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [lastUpdated, setLastUpdated] = useState(new Date());
 
   const fetchAll = useCallback(async () => {
     try {
@@ -93,6 +94,7 @@ const RFQDetail = () => {
       setRfq(rfqRes.data.data);
       setBids(bidsRes.data.data || []);
       setLogs(logsRes.data.data || []);
+      setLastUpdated(new Date());
     } catch (err) {
       console.error('Failed to fetch RFQ data', err);
     } finally {
@@ -134,8 +136,19 @@ const RFQDetail = () => {
             <div className="flex items-center gap-3 mb-1">
               <h2 className="text-2xl font-black text-slate-900">{rfq.rfq_name}</h2>
               <StatusBadge status={status} />
+              {isActive && (
+                <div className="flex items-center gap-1.5 px-2 py-1 bg-blue-50 text-blue-600 rounded-md border border-blue-100 animate-pulse">
+                  <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                  <span className="text-[10px] font-black uppercase tracking-widest">Live</span>
+                </div>
+              )}
             </div>
-            <p className="text-slate-400 font-mono text-sm">{rfq.reference_id}</p>
+            <div className="flex items-center gap-3">
+              <p className="text-slate-400 font-mono text-sm">{rfq.reference_id}</p>
+              <span className="text-[10px] text-slate-300 font-medium italic">
+                Last updated: {format(lastUpdated, 'HH:mm:ss')}
+              </span>
+            </div>
             {rfq.description && <p className="text-slate-500 text-sm mt-2 max-w-xl">{rfq.description}</p>}
           </div>
           <div className="flex flex-col gap-2 text-sm text-right shrink-0">
@@ -197,6 +210,13 @@ const RFQDetail = () => {
           <Activity className="text-blue-500 w-5 h-5" />
           <h3 className="font-black text-slate-900">Activity Log</h3>
           <span className="ml-auto text-xs text-slate-400 bg-slate-50 px-2 py-1 rounded-md">{logs.length} event{logs.length !== 1 ? 's' : ''}</span>
+          <button 
+            onClick={fetchAll}
+            className="ml-2 p-1.5 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-blue-600 transition-colors"
+            title="Refresh Data"
+          >
+            <Activity size={14} />
+          </button>
         </div>
 
         {logs.length === 0 ? (
