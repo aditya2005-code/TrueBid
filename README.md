@@ -234,7 +234,7 @@ Auction extends to 6:05 PM
 
 ---
 
-## ⚙️ Setup Instructions
+## Setup Instructions
 
 ### Backend
 ```bash
