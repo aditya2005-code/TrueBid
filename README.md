@@ -40,14 +40,13 @@ When a bid is placed, it is validated and stored, rankings are updated, and the 
 ![System Diagram](./docs/High_Level_Design.png)
  - Tool use for making HLD diagram - draw.io
 
-# 🗄️ Database Schema – TrueBid RFQ Auction System
+# Database Schema – TrueBid RFQ Auction System
 
-## 📌 Overview
 This system models a **British Auction-based RFQ (Request for Quotation)** process where clients create RFQs and suppliers submit competitive bids. The database is designed using a relational model with **RFQ as the central entity**, ensuring structured data storage, consistency, and auditability.
 
 ---
 
-## 🗂️ ER Diagram
+## ER Diagram
 
 ![ER Diagram](./docs/schema_design.png)
  - Tool used for making Schema Diagram - mermaid live editor
